@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deprem Takip</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body class="bg-[#17151b]">
+    <nav class="bg-[#17151b] text-white ">
+        <div class="container mx-auto py-4">
+            <a href="https://t.me/wouldhack" class="flex items-center space-x-3">
+                <img src="https://www.svgrepo.com/show/303333/monero-logo.svg" class="h-8" alt="Monero Logo">
+                <span class="text-xl font-semibold">WouldHack</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mx-auto py-10">
+        <br>
+        <div class="max-w-full mx-auto border border-white p-8 rounded-lg shadow-md text-white">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold mb-2">Deprem Takip</h2>
+                <p class="text-lg mb-4">Deprem Takip</p>
+                <div class="mb-6">
+                    <div class="flex items-center">
+                        <input type="text" id="search" name="search" class="flex-grow text-white border border-[#625973] bg-[#312c3a] text-sm rounded-lg focus:ring-[#7855f7] focus:border-[#bcb7c8] block w-full p-2.5 mr-5" placeholder="Yer adına göre ara">
+                        <button type="button" id="searchBtn" class="text-white hover:text-white border border-purple-700 hover:bg-[#312c3a] focus:ring-4 focus:outline-none focus:ring-[#312c3a] font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-2 mb-2 dark:border-purple-400 dark:text-purple-400 dark:hover:text-white dark:hover:bg-purple-500 dark:focus:ring-purple-900">Ara</button>
+                    </div>
+                </div>                    
+                <div class="mb-6">
+                    <div class="overflow-x-auto mt-10 mb-6">
+                        <table id="earthquakeTable" class="table-auto w-full border-collapse border border-white">
+                            <thead>
+                                <tr>
+                                    <th class="border border-white px-4 py-2">Tarih(TS)</th>
+                                    <th class="border border-white px-4 py-2">Enlem</th>
+                                    <th class="border border-white px-4 py-2">Boylam</th>
+                                    <th class="border border-white px-4 py-2">Derinlik(Km)</th>
+                                    <th class="border border-white px-4 py-2">Tip</th>
+                                    <th class="border border-white px-4 py-2">Büyüklük</th>
+                                    <th class="border border-white px-4 py-2">Yer</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            fetchEarthquakeData();
+
+            $("#search").keyup(function() {
+                fetchEarthquakeData();
+            });
+
+            $("#searchBtn").click(function() {
+                fetchEarthquakeData();
+            });
+
+            function fetchEarthquakeData() {
+                var searchTerm = $("#search").val().toLowerCase();
+
+                $.ajax({
+                    url: "/api/earthquakes",
+                    type: "GET",
+                    success: function(response) {
+                        var filteredData = response.earthquakes.filter(function(earthquake) {
+                            return earthquake.Yer.toLowerCase().includes(searchTerm);
+                        });
+
+                        renderEarthquakeData(filteredData);
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            title: "Hata!",
+                            icon: "error"
+                        })
+                    }
+                });
+            }
+
+            function renderEarthquakeData(earthquakes) {
+                var tableBody = $("#earthquakeTable tbody");
+                tableBody.empty();
+
+                earthquakes.forEach(function(earthquake) {
+                    var row = "<tr>" +
+                        "<td class='border border-white px-4 py-2'>" + earthquake.Tarih + "</td>" +
+                        "<td class='border border-white px-4 py-2'>" + earthquake.Enlem + "</td>" +
+                        "<td class='border border-white px-4 py-2'>" + earthquake.Boylam + "</td>" +
+                        "<td class='border border-white px-4 py-2'>" + earthquake.Derinlik + "</td>" +
+                        "<td class='border border-white px-4 py-2'>" + earthquake.Tip + "</td>" +
+                        "<td class='border border-white px-4 py-2'>" + earthquake.Büyüklük + "</td>" +
+                        "<td class='border border-white px-4 py-2'>" + earthquake.Yer + "</td>" +
+                        "</tr>";
+
+                    tableBody.append(row);
+                });
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>
